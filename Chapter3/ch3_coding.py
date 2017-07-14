@@ -231,3 +231,72 @@ ovo_clf.predict([some_digit])
 ### Train a random forest; random forests can handle multiple classes naturally and don't require 
 ### OVO or OVA
 
+forest_clf.fit(X_train, y_train)
+forest_clf.predict([some_digit])
+
+### call predict_proba to list the probabilities that the classifier assigned to each instance of the class
+forest_clf.predict_proba([some_digit])
+forest_clf.classes_[np.argmax(forest_clf.predict_proba([some_digit]))]
+
+### use cross validation to evaluate these classifiers 
+cross_val_score(sgd_clf, X_train, y_train, cv = 3 , scoring = "accuracy")
+
+#### preprocess the data with scaling to improve accuracy 
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train.astype(np.float64))
+
+cross_val_score(sgd_clf, X_train_scaled, y_train, cv = 3, scoring = "accuracy")
+
+# Error Analysis
+y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv = 3)
+conf_mx = confusion_matrix(y_train, y_train_pred) 
+
+plt.matshow(conf_mx, cmap=plt.cm.gray)
+plt.show()
+
+row_sums = conf_mx.sum(axis = 1, keepdims = True)
+norm_conf_mx = conf_mx/row_sums
+
+np.fill_diagonal(norm_conf_mx, 0)
+plt.matshow(norm_conf_mx, cmap=plt.cm.gray)
+
+cl_a, cl_b = 3, 5
+
+X_aa = X_train[(y_train == cl_a) & (y_train_pred == cl_a)]
+X_ab = X_train[(y_train == cl_a) & (y_train_pred == cl_b)]
+X_ba = X_train[(y_train == cl_b) & (y_train_pred == cl_a)]
+X_bb = X_train[(y_train == cl_b) & (y_train_pred == cl_b)]
+
+# Multilabel Classification
+from sklearn.neighbors import KNeighborsClassifier
+
+y_train_large = (y_train >= 7)
+y_train_odd = (y_train % 2 == 1)
+y_multilabel = np.c_[y_train_large, y_train_odd]
+
+knn_clf = KNeighborsClassifier()
+knn_clf.fit(X_train, y_multilabel)
+knn_clf.predict([some_digit])
+
+y_train_knn_pred = cross_val_predict(knn_clf, X_train, y_train, cv = 3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
