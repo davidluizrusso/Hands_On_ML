@@ -203,4 +203,31 @@ recall_score(y_train_5, y_train_pred_forest)
 
 # MultiClass classification
 
+sgd_clf.fit(X_train, y_train)
+sgd_clf.predict([some_digit])
+
+## use decision_scores function
+some_digit_scores = sgd_clf.decision_function([some_digit])
+some_digit_scores.max()
+
+### np.argmax returns the index of the largest value in the array
+np.argmax(some_digit_scores)
+
+### the classes_ method returns all possible classes (distinct values of y) in the data
+sgd_clf.classes_
+sgd_clf.classes_[5]
+
+# in this case, the index of the largest value happens to correspond to the class label of 5
+sgd_clf.classes_[np.argmax(some_digit_scores)]
+
+## forcing one vs. one and one vs. all
+from sklearn.multiclass import OneVsOneClassifier
+
+### fit ovo classifier 
+ovo_clf = OneVsOneClassifier(SGDClassifier(random_state=42))
+ovo_clf.fit(X_train, y_train)
+ovo_clf.predict([some_digit])
+
+### Train a random forest; random forests can handle multiple classes naturally and don't require 
+### OVO or OVA
 
