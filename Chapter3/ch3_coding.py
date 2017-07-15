@@ -49,7 +49,7 @@ sgd_clf.predict([some_digit])
 # Performance Measures
 
 ## Measuring Accuracy Using Cross-Validation
-from sklearn.cross_validation import cross_val_score
+from sklearn.model_selection import cross_val_score
 
 cross_val_score(sgd_clf, X_train, y_train_5,
                cv = 3,
@@ -279,9 +279,20 @@ knn_clf = KNeighborsClassifier()
 knn_clf.fit(X_train, y_multilabel)
 knn_clf.predict([some_digit])
 
-y_train_knn_pred = cross_val_predict(knn_clf, X_train, y_train, cv = 3)
+# y_train_knn_pred = cross_val_predict(knn_clf, X_train, y_train, cv = 3)
 
+# Multioutput Classification
 
+from numpy import random as rnd
+
+noise_train = rnd.randint(0, 100, (len(X_train), 784))
+noise_test = rnd.randint(0, 100, (len(X_test), 784))
+X_train_mod = X_train + noise_train
+X_test_mod = X_test + noise_test
+y_train_mod = X_train
+y_test_mod = X_test
+
+knn_clf.fit(X_train_mod, y_train_mod)
 
 
 
