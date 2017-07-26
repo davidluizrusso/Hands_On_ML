@@ -13,6 +13,7 @@ from scipy.ndimage.interpolation import shift
 import csv
 import pandas as pd
 import os
+from math import sqrt
 
 
 ############################################# Exercise 1 #############################################
@@ -103,6 +104,34 @@ X_expanded.shape
 INPUT_DIR = os.path.join("/Users/davidrusso/Documents/Programming/Python/Hands_On_ML/Chapter3", "Input")
 OUTPUT_DIR = os.path.join("/Users/davidrusso/Documents/Programming/Python/Hands_On_ML/Chapter3", "Output")
 
+train = pd.read_csv(os.path.join(INPUT_DIR, "train.csv"))
+test = pd.read_csv(os.path.join(INPUT_DIR, "test.csv"))
+
+# exploratory data analysis
+
+train.columns
+
+train.describe()
+# PassengerID ranges from 1 to 891
+# Survived is binary 0,1; this is what we are modeling. 
+# Pclass describes socio-economic status: 1 is upper, 2 is middle, 3 is lower. Average class is 2.30
+# Age ranges from 0.42 to 80; average age is 29.7
+# SibSP is the number of siblings, ranges from 0 to 8
+# Parch is the number of parents or children, ranges from 0 to 6
+# Fare is the price the passenger paid, ranging from 0 to 512
+
+train['Survived'].value_counts() # 342 survived, 549 died
+train['Pclass'].value_counts() # 491 3, 184 2, 216 1
+
+train.apply(lambda x: x.isnull().sum()) # 177 missing Age, 687 missing cabin, 2 missing Embarked 
+
+train[train['Fare'] == 0].shape
+
+# separate features and target
+features = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Cabin', 'Embarked']
+
+trainX = train[features]
+trainY = train['Survived']
 
       
 
