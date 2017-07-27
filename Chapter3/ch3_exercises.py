@@ -14,6 +14,9 @@ import csv
 import pandas as pd
 import os
 from math import sqrt
+from sklearn.linear_model import SGDClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
 
 
 ############################################# Exercise 1 #############################################
@@ -128,15 +131,51 @@ train.apply(lambda x: x.isnull().sum()) # 177 missing Age, 687 missing cabin, 2 
 train[train['Fare'] == 0].shape
 
 # separate features and target
-features = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Cabin', 'Embarked']
+features = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Sex', 'Embarked']
 
 trainX = train[features]
 trainY = train['Survived']
 
-      
+# replace missing ages with random number ranging from 0 to 80, with a mean of 29.7 and a std of 14
+trainX['Age'] = trainX.groupby(['Pclass'])['Age'].transform(lambda x: x.fillna(x.mean()))
+
+# replace missing Embarked values with most common Embarked variable S
+trainX['Embarked'] = trainX['Embarked'].fillna('S')
+
+
+trainX["Sex"][trainX["Sex"] == "male"] = 0
+trainX["Sex"][trainX["Sex"] == "female"] = 1
+trainX["Embarked"][trainX["Embarked"] == "S"] = 0
+trainX["Embarked"][trainX["Embarked"] == "C"] = 1
+trainX["Embarked"][trainX["Embarked"] == "Q"] = 2
+
+trainX.apply(lambda x: x.isnull().sum())
+
+# scale features
+# scaler = StandardScaler()
+# trainX_scaled = scaler.fit_transform(trainX[['Age', 'SibSp', 'Parch', 'Fare', 'Pclass']])
+
+# SGD classifier
+sgd_clf = SGDClassifier(random_state = 42)
+sgd_clf.fit(trainX, trainY)
+
+cross_val_score(sgd_clf, trainX, trainY, cv = 10, scoring = "accuracy")
+
+# Random Forest Classifier
+forest_clf = RandomForestClassifier(random_state=42)
+y_probas_forest = cross_val_predict(forest_clf, trainX, trainY, cv =  10, method = "predict_proba")
+y_scores_forest = y_probas_forest[:, 1]
+
+roc_auc_score(trainY, y_scores_forest)
+
+cross_val_score(forest_clf, trainX, trainY, cv = 10, scoring = "accuracy").mean()
+
+forest_clf.fit(trainX, trainY) 
+importance = forest_clf.feature_importances_
+importance = pd.DataFrame(importance, index=trainX.columns, 
+                          columns=["Importance"])
 
 ############################################# Exercise 4 #############################################
-
 
 
 
