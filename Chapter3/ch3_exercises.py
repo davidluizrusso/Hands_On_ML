@@ -17,6 +17,7 @@ from math import sqrt
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
+import sys
 
 
 ############################################# Exercise 1 #############################################
@@ -177,18 +178,37 @@ importance = pd.DataFrame(importance, index=trainX.columns,
 
 ############################################# Exercise 4 #############################################
 ### build a spam classifier 
-
+sys.setdefaultencoding('Cp1252')
 # 1 - Download examples of spam and ham and load into a data frame
+
+# training data dir
+trainDir = "/Users/davidrusso/Documents/Programming/Python/Hands_On_ML/Chapter3/ham_and_spam/train-mails"
+
+# testing data dir
+
 def make_Dictionary(train_dir):
     emails = [os.path.join(train_dir,f) for f in os.listdir(train_dir)]    
     all_words = []       
     for mail in emails:    
-        with open(mail) as m:
+        with open(mail).read().decode('utf-8', 'ignore') as m:
             for i,line in enumerate(m):
                 if i == 2:  #Body of email is only 3rd line of text file
                     words = line.split()
                     all_words += words
     dictionary = Counter(all_words)
+    
+    list_to_remove = dictionary.keys()
+    for item in list_to_remove:
+        if item.isalpha() == False: 
+            del dictionary[item]
+        elif len(item) == 1:
+            del dictionary[item]
+    dictionary = dictionary.most_common(3000)
+    return dictionary
+    
+dict = make_Dictionary(train_dir = trainDir)
+    
+
 
 
 
