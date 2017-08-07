@@ -8,6 +8,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import ElasticNet
+from sklearn.base import clone
 
 ### The normal equations
 
@@ -132,8 +135,43 @@ plot_learning_curves(polynomial_regression, X, y)
 ### Regularized Linear Models
 
 # Ridge Regression
+ridge_reg = Ridge(alpha = 1, solver = "cholesky")
+ridge_reg.fit(X, y)
+ridge_reg.predict([[1.5]])
 
+# using SGD
+sgd_reg = SGDRegressor(penalty = "l2")
+sgd_reg.fit(X, y.ravel())
+sgd_reg.predict([[1.5]])
 
+# Lasso Regression
+lasso_reg = Lasso(alpha = 0.1)
+lasso_reg.fit(X, y)        
+lasso_reg.predict([[1.5]])    
 
+# Elastic Net
+elastic_net = ElasticNet(alpha = 0.1, l1_ratio = 0.5)
+elastic_net.fit(X, y)
+elastic_net.predict([[1.5]])
+
+### Early Stopping
+
+sgd_reg = SGDRegressor(n_iter = 1, warm_start = True, penalty = None,
+                       learning_rate = "constant", eta0 = 0.0005)
+                       
+minimum_val_error = float("inf")
+best_epoch = None
+best_model = None
+for epoch in range(1000):
+    sgd_reg.fit(X_train, y_train)
+    y_val_predict = sgd_reg.predict(X_val)
+    val_error = mean_squared_error(y_val_predict, y_val)
+    if val_error < minimum_val_error:
+        minimum_val_error = val_error
+        best_epoch = epoch
+        best_model = clone(sgd_reg)
         
+### Logistic Regression
+
+
     
