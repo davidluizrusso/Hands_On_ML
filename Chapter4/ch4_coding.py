@@ -11,6 +11,8 @@ from sklearn.linear_model import Ridge
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import ElasticNet
 from sklearn.base import clone
+from sklearn import datasets
+from sklearn.linear_model import LogisticRegression
 
 ### The normal equations
 
@@ -172,6 +174,33 @@ for epoch in range(1000):
         best_model = clone(sgd_reg)
         
 ### Logistic Regression
+iris = datasets.load_iris()
+list(iris.keys())
+
+X = iris["data"][:, 3:] # petal width
+y = (iris["target"] == 2).astype(np.int)
+
+log_reg = LogisticRegression()
+log_reg.fit(X, y)
+
+X_new = np.linspace(0, 3, 1000).reshape(-1, 1)
+y_proba = log_reg.predict_proba(X_new)
+
+plt.plot(X_new, y_proba[:, 1], "g-", label = "Iris-Virginica")
+plt.plot(X_new, y_proba[:, 0], "b--", label = "Not Iris-Virginia")
+
+log_reg.predict([[1.7], [1.5]])    
 
 
-    
+### Softmax Regression
+X = iris["data"][:, (2, 3)] 
+y = iris["target"]
+
+softmax_reg = LogisticRegression(multi_class = "multinomial", solver = "lbfgs", C = 10)
+softmax_reg.fit(X, y)
+softmax_reg.predict([[5, 2]])
+softmax_reg.predict_proba([[5, 2]])
+
+
+
+
